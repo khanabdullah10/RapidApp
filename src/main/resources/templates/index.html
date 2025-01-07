@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Voting System App</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      padding: 2rem 0;
+    }
+
+    .container {
+      max-width: 800px;
+    }
+
+    .card {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+      background: rgba(255, 255, 255, 0.95);
+      margin-bottom: 2rem;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .page-title {
+      color: #2c3e50;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .list-group-item {
+      border: none;
+      background: transparent;
+      padding: 1.5rem;
+    }
+
+    .poll-question {
+      color: #34495e;
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .btn {
+      border-radius: 8px;
+      padding: 0.5rem 1.5rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-success {
+      background: #2ecc71;
+      border: none;
+    }
+
+    .btn-success:hover {
+      background: #27ae60;
+      transform: translateY(-2px);
+    }
+
+    .btn-warning {
+      background: #f1c40f;
+      border: none;
+      color: #2c3e50;
+    }
+
+    .btn-warning:hover {
+      background: #f39c12;
+      transform: translateY(-2px);
+    }
+
+    .form-control {
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      border: 2px solid #e0e0e0;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+      border-color: #3498db;
+      box-shadow: none;
+    }
+
+    .option-input {
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .create-poll-section {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .section-title {
+      color: #2c3e50;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1 class="page-title animate__animated animate__fadeIn">Community Voting Hub</h1>
+
+  <div class="card animate__animated animate__fadeInUp">
+    <div class="card-body">
+      <h2 class="section-title">Active Polls</h2>
+      <ul class="list-group">
+        <th:block th:if="${not #lists.isEmpty(polls)}">
+          <li th:each="poll : ${polls}" class="list-group-item">
+            <h5 class="poll-question" th:text="${poll.question}"></h5>
+            <div class="d-flex gap-3">
+              <a th:href="@{/poll/{id}(id=${poll.id})}" class="btn btn-success">
+                <i class="fas fa-vote-yea me-2"></i>Vote Now
+              </a>
+              <a th:href="@{/poll/{id}/results(id=${poll.id})}" class="btn btn-warning">
+                <i class="fas fa-chart-bar me-2"></i>Results
+              </a>
+            </div>
+          </li>
+        </th:block>
+        <th:block th:if="${#lists.isEmpty(polls)}">
+          <li class="list-group-item text-center text-muted">
+            <i class="fas fa-inbox fa-2x mb-2"></i>
+            <p>No active polls available at the moment.</p>
+          </li>
+        </th:block>
+      </ul>
+    </div>
+  </div>
+
+  <div class="create-poll-section animate__animated animate__fadeInUp">
+    <h2 class="section-title">Create a New Poll</h2>
+    <form id="createPollForm" th:action="@{/poll}" method="post">
+      <div class="mb-4">
+        <label for="question" class="form-label">What would you like to ask?</label>
+        <input type="text" id="question" name="question" class="form-control"
+               placeholder="Enter your question here" required>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label">Answer Options</label>
+        <div id="optionsContainer">
+          <input type="text" name="options" class="form-control mb-3"
+                 placeholder="Option 1" required>
+        </div>
+      </div>
+
+      <div class="d-grid gap-3">
+        <button type="button" class="btn btn-outline-primary" onclick="addOption()">
+          <i class="fas fa-plus me-2"></i>Add Another Option
+        </button>
+        <button type="submit" class="btn btn-success">
+          <i class="fas fa-paper-plane me-2"></i>Create Poll
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+<script>
+  function addOption() {
+    const optionsContainer = document.getElementById('optionsContainer');
+    const optionCount = optionsContainer.children.length + 1;
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.name = 'options';
+    input.className = 'form-control mb-3 option-input';
+    input.placeholder = `Option ${optionCount}`;
+    input.required = true;
+
+    optionsContainer.appendChild(input);
+  }
+
+  // Add smooth scrolling to all links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      document.querySelector(this.getAttribute('href')).scrollIntoView({
+        behavior: 'smooth'
+      });
+    });
+  });
+</script>
+</body>
+</html>
