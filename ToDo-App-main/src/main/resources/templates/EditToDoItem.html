@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Edit Item</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <h1 class="p-3">Edit Item</h1>
+
+    <form th:action="@{/editSaveToDoItem}" method="post" th:object="${todo}">
+        <input type="hidden" th:field="*{id}"/>
+
+        <div class="row">
+            <div class="form-group col-md-12">
+                <label class="col-md-3" for="title">Title</label>
+                <div class="col-md-6">
+                    <input type="text" th:field="*{title}" id="title" class="form-control input-sm" required="required"/>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-12">
+                <label class="col-md-3" for="date">Date</label>
+                <div class="col-md-6">
+                    <input type="date" th:field="*{date}" id="date" class="form-control input-sm" required="required"/>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-md-12">
+                <label class="col-md-3" for="status">Status</label>
+                <div class="col-md-6">
+                    <input type="text" th:field="*{status}" id="status" class="form-control input-sm" th:value="'Incomplete'"/>
+                </div>
+            </div>
+        </div>
+
+        <div class="row p-2">
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-success">Save</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script th:inline="javascript">
+    window.onload = function() {
+        var msg = [[${message}]];
+
+        if (msg === "Edit Failure") {
+            toastr.error("Something went wrong with the edit.");
+        }
+
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+    }
+</script>
+</body>
+</html>

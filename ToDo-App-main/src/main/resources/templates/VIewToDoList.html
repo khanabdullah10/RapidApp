@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="ISO-8859-1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View ToDo Item List</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- Toastr CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
+    <!-- jQuery and Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <style>
+        a {
+            color: white;
+            text-decoration: none;
+        }
+        a:hover {
+            color: white;
+            text-decoration: none;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 class="p-3">ToDo Item List</h1>
+
+    <!-- Table to display ToDo Items -->
+    <table class="table table-bordered">
+        <thead class="thead-dark">
+        <tr>
+            <th>Id</th>
+            <th>Title</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Mark Completed</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="todo : ${list}">
+            <td th:text="${todo.id}"></td>
+            <td th:text="${todo.title}"></td>
+            <td th:text="${todo.date}"></td>
+            <td th:text="${todo.status}"></td>
+            <td>
+                <a th:href="@{/updateToDoStatus/{id}(id=${todo.id})}" class="btn btn-success">Mark Complete</a>
+            </td>
+            <td>
+                <a th:href="@{/editToDoItem/{id}(id=${todo.id})}" class="btn btn-primary">Edit</a>
+            </td>
+            <td>
+                <a th:href="@{/deleteToDoItem/{id}(id=${todo.id})}" class="btn btn-danger">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Button to add a new ToDo Item -->
+    <a th:href="@{/addToDoItem}" class="btn btn-primary btn-block">Add New ToDo Item</a>
+</div>
+
+<!-- Toastr Notifications -->
+<script th:inline="javascript">
+    window.onload = function() {
+        var msg = [[${message}]];
+
+        if (msg === "Save Success") {
+            toastr.success("Item added successfully!");
+        } else if (msg === "Delete Success") {
+            toastr.success("Item deleted successfully!");
+        } else if (msg === "Delete Failure") {
+            toastr.error("Error occurred: Unable to delete item.");
+        } else if (msg === "Edit Success") {
+            toastr.success("Item updated successfully!");
+        }
+
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+    };
+</script>
+</body>
+</html>
